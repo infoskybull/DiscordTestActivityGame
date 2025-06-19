@@ -3,8 +3,6 @@ let recognization = new webkitSpeechRecognition();
 var result = false;
 var stop = true; // Initially stopped
 var started = false; // Recognition has not started yet
-recognization.continuous = true;
-recognization.interimResults = true;
 var GameObjName = null;
 
 function SetGameObjectName(name) {
@@ -21,46 +19,35 @@ function runspeechrecognition(listenContinuous) {
     };
 
     recognization.onresult = (e) => {
-        //var transcript = e.results[0][0].transcript;
-        //console.log("Speech recognition result:", transcript);
+        var transcript = e.results[0][0].transcript;
+        console.log("Speech recognition result:", transcript);
 
-        //window.Gameinstance.SendMessage(GameObjName, "Result", transcript);
-        //result = true;
-
-        //if (listenContinuous && !stop) {
-        //    setTimeout(() => {
-        //        if (!started) {
-        //            recognization.start(); // Restart recognition
-        //        }
-        //    }, 100);
-        //}
-        let transcript = "";
-        for (let i = e.resultIndex; i < e.results.length; ++i) {
-            transcript += e.results[i][0].transcript;
-        }
-
-        console.log("Transcript:", transcript);
-        window.Gameinstance.SendMessage(GameObjName, "Result", transcript);
+        window.Gameinstance.SendMessage(GameObjName, "OnMicResult", transcript);
         result = true;
+
+        // if (listenContinuous && !stop) {
+            // setTimeout(() => {
+                // if (!started) {
+                    // recognization.start(); // Restart recognition
+                // }
+            // }, 100);
+        // }
     };
 
     recognization.onend = () => {
         console.log("Speech recognition ended");
         started = false;
+		
+		window.Gameinstance.SendMessage(GameObjName, "OnMicEnd");
+		stop = true;
 
-        //if (!result && listenContinuous && !stop) {
-        //    setTimeout(() => {
-        //        if (!started) {
-        //            recognization.start(); // Restart recognition
-        //        }
-        //    }, 100);
-        //}
-
-        //if (listenContinuous && !stop) {
-        //    setTimeout(() => {
-        //        if (!started) recognization.start();
-        //    }, 100);
-        //}
+        // if (!result && listenContinuous && !stop) {
+            // setTimeout(() => {
+                // if (!started) {
+                    // recognization.start(); // Restart recognition
+                // }
+            // }, 100);
+        // }
     };
 
     // Start recognition if it is not running and has not been stopped
